@@ -40,54 +40,47 @@
         return staticFeedbacks;
     }
 
-    // Helper function to create carousel items
-    function createCarouselItem(feedback) {
-        const item = document.createElement("div");
-        item.className = "carousel-item";
-        item.innerHTML = `
-            <blockquote>${feedback.message}</blockquote>
-            <p>- ${feedback.name} (${new Date(feedback.date).toDateString()})</p>
+    // Helper function to create feedback card (replacing createCarouselItem)
+    function createFeedbackCard(feedback) {
+        const card = document.createElement("div");
+        card.className = "feedback-card";
+        card.innerHTML = `
+            <div class="feedback-content">
+                <div class="feedback-message">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <blockquote>${feedback.message}</blockquote>
+                </div>
+                <div class="feedback-author">
+                    <p class="author-name">${feedback.name}</p>
+                    <p class="feedback-date">${new Date(feedback.date).toDateString()}</p>
+                </div>
+            </div>
         `;
-        return item;
+        return card;
     }
 
-    // Initialize the carousel
-    async function initializeCarousel() {
+    // Initialize the feedback display (replacing initializeCarousel)
+    async function initializeFeedbacks() {
         const feedbacks = await fetchFeedbacks();
-        const carouselContainer = document.querySelector("#feedback-carousel .carousel-inner");
-        if (!carouselContainer) {
-            console.error("Carousel container not found!");
+        const container = document.querySelector("#feedback-carousel");
+        if (!container) {
+            console.error("Feedback container not found!");
             return;
         }
 
-        let currentIndex = 0;
+        // Remove carousel-specific classes and add grid container class
+        container.className = "feedback-grid";
 
-        // Populate the carousel with feedback items
+        // Clear existing content
+        container.innerHTML = "";
+
+        // Populate the container with feedback cards
         feedbacks.forEach(feedback => {
-            const item = createCarouselItem(feedback);
-            carouselContainer.appendChild(item);
-        });
-
-        const items = carouselContainer.querySelectorAll(".carousel-item");
-        if (items.length > 0) items[currentIndex].classList.add("active");
-
-        // Carousel controls
-        const prevButton = document.querySelector("#feedback-carousel .prev");
-        const nextButton = document.querySelector("#feedback-carousel .next");
-
-        prevButton?.addEventListener("click", () => {
-            items[currentIndex].classList.remove("active");
-            currentIndex = (currentIndex === 0) ? items.length - 1 : currentIndex - 1;
-            items[currentIndex].classList.add("active");
-        });
-
-        nextButton?.addEventListener("click", () => {
-            items[currentIndex].classList.remove("active");
-            currentIndex = (currentIndex === items.length - 1) ? 0 : currentIndex + 1;
-            items[currentIndex].classList.add("active");
+            const card = createFeedbackCard(feedback);
+            container.appendChild(card);
         });
     }
 
     // Wait for the DOM to load before initializing
-    document.addEventListener("DOMContentLoaded", initializeCarousel);
+    document.addEventListener("DOMContentLoaded", initializeFeedbacks);
 })();
